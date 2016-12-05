@@ -5,14 +5,15 @@
 %Navish Wadhwa - v1.5
 
 %This area contians the path to the folder containing the tdms files to be
-%converted. This should be changed everytime new files are to be converted.
+%converted. This should be changed everytime new files are to be converted
 
-path='E:\work\08-04\';
-
+start_path=pwd;
+folder_name = uigetdir(start_path,'Select folder containing tdms files to be converted to mat:');
+cd(folder_name)
 %----------------------------------------------------------------
 
 % Collect a list of all the files in the current directory
-Files=dir(strcat(path,'*.tdms'));
+Files=dir('*.tdms');
 
 % Measure how long the list of files is
 lengthFiles=length(Files);
@@ -21,10 +22,10 @@ lengthFiles=length(Files);
 %after the other. All mat files will be saves in the same directory as the
 %tdms files
 for i=1:lengthFiles
-       simpleConvertTDMS(strcat(path,Files(i).name));
+       simpleConvertTDMS(Files(i).name);
 end
 
 % Display completion message when done
-fprintf('Completed''\n');
-clear;
+disp('All done.')
+
 
