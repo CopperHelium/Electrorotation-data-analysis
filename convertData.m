@@ -4,8 +4,8 @@
 %----------------------------------------------------------------
 %Navish Wadhwa - v1.5
 
-%This area contians the path to the folder containing the tdms files to be
-%converted. This should be changed everytime new files are to be converted
+%Ask the user to select folder. use current working directory as a starting
+%point. 
 
 start_path=pwd;
 folder_name = uigetdir(start_path,'Select folder containing tdms files to be converted to mat:');
