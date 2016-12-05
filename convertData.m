@@ -3,6 +3,9 @@
 %
 %----------------------------------------------------------------
 %Navish Wadhwa - v1.5
+% - Made user select folder. 
+% - updated comments. 
+% - general cleanup.
 
 %Ask the user to select folder. use current working directory as a starting
 %point. 
