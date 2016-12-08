@@ -58,13 +58,16 @@ for ii = 1:size(ON_pairs,1) %ON_pairs and OFF_pairs are the same size
 fc = 40; 
 [b,a] = butter(6,fc/(fs/2),'high'); 
 
+%Get the "chunk" of data for this computation
 X_chunk = X_signal(ON_pairs(ii,1):ON_pairs(ii,2));
 Y_chunk = Y_signal(ON_pairs(ii,1):ON_pairs(ii,2));
 
 X_chunk = filter(b,a,X_chunk); %apply the highpass filter
+Y_chunk = filter(b,a,Y_chunk); %apply the highpass filter
 
-[pxx,f] = periodogram(X_chunk - mean(X_chunk), [],[],fs);
-[~,loc] = max(pxx);
+[pxx] = periodogram(X_chunk - mean(X_chunk), [],[],fs);
+[pyy,f] = periodogram(Y_chunk - mean(Y_chunk), [],[],fs);
+[~,loc] = max(pxx+pyy);
 FRE_ON(ii) = f(loc);
 
 % The other method to work almost equally well was pmtm (below). 
@@ -91,10 +94,12 @@ X_chunk = X_signal(OFF_pairs(ii,1):OFF_pairs(ii,2));
 Y_chunk = Y_signal(OFF_pairs(ii,1):OFF_pairs(ii,2));
 
 X_chunk = filter(b,a,X_chunk); %apply the lowpass filter
+Y_chunk = filter(b,a,Y_chunk); %apply the lowpass filter
 
 
 [pxx,f] = periodogram(X_chunk - mean(X_chunk), [],[],fs);
-[~,loc] = max(pxx);
+pyy = periodogram(Y_chunk - mean(Y_chunk), [],[],fs);
+[~,loc] = max(pxx+pyy);
 FRE_OFF(ii) = f(loc);
 
 % [pxx2,f2] = pmtm(X_chunk - mean(X_chunk),1.25,[],rate);
@@ -125,10 +130,12 @@ X_chunk = X_signal(REC_pairs(jj,1):REC_pairs(jj,2));
 Y_chunk = Y_signal(REC_pairs(jj,1):REC_pairs(jj,2));
 
 X_chunk = filter(b,a,X_chunk); %apply the lowpass filter
+Y_chunk = filter(b,a,Y_chunk); %apply the lowpass filter
 
 
 [pxx,f] = periodogram(X_chunk - mean(X_chunk), [],[],fs);
-[~,loc] = max(pxx);
+pyy = periodogram(Y_chunk - mean(Y_chunk), [],[],fs);
+[~,loc] = max(pxx+pyy);
 FRE_REC(jj) = f(loc);
 
 % [pxx2,f2] = pmtm(X_chunk - mean(X_chunk),1.25,[],rate);
