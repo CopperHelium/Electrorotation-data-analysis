@@ -79,10 +79,19 @@ FRE_ON(ii) = f(loc);
 
 %OFF
 
+% apply a low filter on the OFF data to prevent spurious high freqs from
+% affecting the calculation. The OFF freq in proper experiments done above 
+% ~15 degree C is expected to be well below ~50 Hz. Keep the cutoff fc
+% around 50-100 Hz
 
+fc = 50; 
+[b,a] = butter(6,fc/(fs/2),'low'); 
 
 X_chunk = X_signal(OFF_pairs(ii,1):OFF_pairs(ii,2));
 Y_chunk = Y_signal(OFF_pairs(ii,1):OFF_pairs(ii,2));
+
+X_chunk = filter(b,a,X_chunk); %apply the lowpass filter
+
 
 [pxx,f] = periodogram(X_chunk - mean(X_chunk), [],[],fs);
 [~,loc] = max(pxx);
@@ -102,10 +111,21 @@ end
 % REC
 
 FRE_REC = zeros(size(REC_pairs,1),1);
-for jj = 20%1:size(REC_pairs,1) %REC_pairs are of a different size
+for jj = 1:size(REC_pairs,1) %REC_pairs are of a different size
 
+    % apply a low filter on the REC data to prevent spurious high freqs from
+% affecting the calculation. The REC freq in proper experiments done above 
+% ~15 degree C is expected to be well below ~50 Hz. Keep the cutoff fc
+% around 50-100 Hz
+
+fc = 50; 
+[b,a] = butter(6,fc/(fs/2),'low'); 
+    
 X_chunk = X_signal(REC_pairs(jj,1):REC_pairs(jj,2));
 Y_chunk = Y_signal(REC_pairs(jj,1):REC_pairs(jj,2));
+
+X_chunk = filter(b,a,X_chunk); %apply the lowpass filter
+
 
 [pxx,f] = periodogram(X_chunk - mean(X_chunk), [],[],fs);
 [~,loc] = max(pxx);
@@ -115,8 +135,8 @@ FRE_REC(jj) = f(loc);
 % [~,loc] = max(pxx2);
 % FRE_Off_pmtm = f2(loc)
 
-figure;
-plot(f,pxx)
+% figure;
+% plot(f,pxx)
 
 
 end
