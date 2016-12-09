@@ -4,7 +4,7 @@ clear
 
 %Load the mat file containing the data. Eventually this should be in a loop
 %going through all files in a cerain folder(s).
-load('C:\Users\Navish\Dropbox\Electrorotation Data\11-10-16\16h_24m_15s.mat')
+load('C:\Users\Navish\Dropbox\Electrorotation Data\11-10-16\17h_18m_54s.mat')
 
 X_signal = UntitledVoltage_0.Data; % Contains X-Photomultiplier signal
 Y_signal = UntitledVoltage_1.Data; % Contains Y-Photomultiplier signal
@@ -170,12 +170,15 @@ end
 % ylabel('Frequency (Hz)')
 
 % Plot the OFF frequency with time.
-figure;
+top = 2*ceil(0.5*max([FRE_OFF;FRE_REC]));
+
+h = figure;
 subplot(1,2,1)
 plot(T_OFF,FRE_OFF,'--o')
 xlabel('Time (s)')
 ylabel('Frequency (Hz)')
 title('Dissociation')
+ylim([0 top])
 
 % Plot the REC frequency with time.
 % figure;
@@ -185,3 +188,7 @@ plot(T_REC,FRE_REC,'--o')
 xlabel('Time (s)')
 ylabel('Frequency (Hz)')
 title('Recovery')
+ylim([0 top])
+
+set(h, 'Position', [50, 200, 1400, 500]);
+saveas(h,'plot.pdf')
