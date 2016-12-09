@@ -2,9 +2,30 @@ clc;
 close all
 clear
 
+%Ask the user to select folder containing the .mat data files to be 
+% analyzed for freq. Use current working directory as a starting point. 
+
+start_path=pwd;
+folder_name = uigetdir(start_path,'Select folder containing .mat files to be analyzed:');
+cd(folder_name)
+%----------------------------------------------------------------
+
+% Collect a list of all the files in the current directory
+Files=dir('*.mat');
+
+% Measure how long the list of files is
+lengthFiles=length(Files);
+
+
+
+for kk = 1:lengthFiles
+
+   file_name = Files(kk).name;
+   path_name = strcat(folder_name,'\',file_name)
+    
 %Load the mat file containing the data. Eventually this should be in a loop
 %going through all files in a cerain folder(s).
-load('C:\Users\Navish\Dropbox\Electrorotation Data\11-10-16\16h_24m_15s.mat')
+load(path_name)
 
 X_signal = UntitledVoltage_0.Data; % Contains X-Photomultiplier signal
 Y_signal = UntitledVoltage_1.Data; % Contains Y-Photomultiplier signal
@@ -170,14 +191,29 @@ end
 % ylabel('Frequency (Hz)')
 
 % Plot the OFF frequency with time.
-figure;
+top = 2*ceil(0.5*max([FRE_OFF;FRE_REC]));
+
+h = figure;
+subplot(1,2,1)
 plot(T_OFF,FRE_OFF,'--o')
 xlabel('Time (s)')
 ylabel('Frequency (Hz)')
-title('')
+title('Dissociation')
+ylim([0 top])
 
 % Plot the REC frequency with time.
-figure;
+% figure;
+file_out = strcat(file_name(1:end-4),'_OUT.mat');
+save(file_out,'FRE_OFF','FRE_ON','FRE_REC','T_ON','T_OFF','T_REC')
+
+subplot(1,2,2)
 plot(T_REC,FRE_REC,'--o')
 xlabel('Time (s)')
 ylabel('Frequency (Hz)')
+title('Recovery')
+ylim([0 top])
+
+set(h, 'Position', [50, 200, 1400, 500]);
+saveas(h,'plot.pdf')
+
+end
