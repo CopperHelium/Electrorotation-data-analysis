@@ -4,7 +4,7 @@ clear
 
 %Load the mat file containing the data. Eventually this should be in a loop
 %going through all files in a cerain folder(s).
-load('C:\Users\Navish\Dropbox\Electrorotation Data\17h_17m_35s.mat')
+load('C:\Users\Navish\Dropbox\Electrorotation Data\11-10-16\16h_24m_15s.mat')
 
 X_signal = UntitledVoltage_0.Data; % Contains X-Photomultiplier signal
 Y_signal = UntitledVoltage_1.Data; % Contains Y-Photomultiplier signal
@@ -32,7 +32,7 @@ OnOff_duration = OFF_dur + ON_dur; % Total duration of each cycle
 % The matrix above missed the last OFF event immediately following the last
 % ON event and before the recovery starts (two seconds after the last ON).
 % Adding that bit to the Off_pairs here.
-OFF_pairs = vertcat(OFF_pairs,[OnOff(end) OnOff(end)+(OFF_pairs(3,2)-OFF_pairs(3,1))]);
+OFF_pairs = vertcat([1 OnOff(1)],OFF_pairs,[OnOff(end) OnOff(end)+(OFF_pairs(3,2)-OFF_pairs(3,1))]);
 
 %Recovery starts when the final OFF event ends, until the end of sampling.
 %Divided that section of the data into chunks of the same size as OFF
@@ -46,9 +46,13 @@ REC_pairs = [REC_array(1:end-1)' REC_array(2:end)'];
 FRE_ON = zeros(size(ON_pairs,1),1);
 FRE_OFF = zeros(size(OFF_pairs,1),1);
 
-for ii = 1:size(ON_pairs,1) %ON_pairs and OFF_pairs are the same size
+
+T_ON = zeros(size(ON_pairs,1),1);
+T_OFF = zeros(size(OFF_pairs,1),1);
 
 %ON
+
+for ii = 1:size(ON_pairs,1)
 
 % apply a highpass filter on the ON data to prevent spurious low freqs from
 % affecting the calculation. The ON freq in proper experiments done above 
@@ -62,6 +66,7 @@ fc = 40;
 X_chunk = X_signal(ON_pairs(ii,1):ON_pairs(ii,2));
 Y_chunk = Y_signal(ON_pairs(ii,1):ON_pairs(ii,2));
 
+
 X_chunk = filter(b,a,X_chunk); %apply the highpass filter
 Y_chunk = filter(b,a,Y_chunk); %apply the highpass filter
 
@@ -69,7 +74,7 @@ Y_chunk = filter(b,a,Y_chunk); %apply the highpass filter
 [pyy,f] = periodogram(Y_chunk - mean(Y_chunk), [],[],fs);
 [~,loc] = max(pxx+pyy);
 FRE_ON(ii) = f(loc);
-
+T_ON(ii) = (mean(ON_pairs(ii,:))-ON_pairs(1,1))/fs;
 % The other method to work almost equally well was pmtm (below). 
 % [pxx2,f2] = pmtm(X_chunk - mean(X_chunk),1.25,[],rate);
 % [~,loc] = max(pxx2);
@@ -80,7 +85,11 @@ FRE_ON(ii) = f(loc);
 % plot(f,pxx)
 % xlim([0 500])
 
+end
+
 %OFF
+
+for ii = 1:size(OFF_pairs,1) %ON_pairs and OFF_pairs are NOT the same size
 
 % apply a low filter on the OFF data to prevent spurious high freqs from
 % affecting the calculation. The OFF freq in proper experiments done above 
@@ -101,6 +110,7 @@ Y_chunk = filter(b,a,Y_chunk); %apply the lowpass filter
 pyy = periodogram(Y_chunk - mean(Y_chunk), [],[],fs);
 [~,loc] = max(pxx+pyy);
 FRE_OFF(ii) = f(loc);
+T_OFF(ii) = (mean(OFF_pairs(ii,:))-ON_pairs(1,1))/fs;
 
 % [pxx2,f2] = pmtm(X_chunk - mean(X_chunk),1.25,[],rate);
 % [~,loc] = max(pxx2);
@@ -112,10 +122,13 @@ FRE_OFF(ii) = f(loc);
 % xlim([0 20])
 
 end
+T_OFF(1)=0; % The first one is at t = 0 in the experiment.
+
 
 % REC
 
 FRE_REC = zeros(size(REC_pairs,1),1);
+T_REC = zeros(size(REC_pairs,1),1);
 for jj = 1:size(REC_pairs,1) %REC_pairs are of a different size
 
     % apply a low filter on the REC data to prevent spurious high freqs from
@@ -137,6 +150,7 @@ Y_chunk = filter(b,a,Y_chunk); %apply the lowpass filter
 pyy = periodogram(Y_chunk - mean(Y_chunk), [],[],fs);
 [~,loc] = max(pxx+pyy);
 FRE_REC(jj) = f(loc);
+T_REC(jj) = (mean(REC_pairs(jj,:))-ON_pairs(1,1))/fs;
 
 % [pxx2,f2] = pmtm(X_chunk - mean(X_chunk),1.25,[],rate);
 % [~,loc] = max(pxx2);
@@ -149,14 +163,25 @@ FRE_REC(jj) = f(loc);
 end
 
 % Plot the ON frequency with time
-figure;
-plot(FRE_ON,'--o')
-ylim([0 max(FRE_ON)+ (max(FRE_ON) - min(FRE_ON))])
+% figure;
+% plot(T_ON,FRE_ON,'--o')
+% ylim([0 max(FRE_ON)+ (max(FRE_ON) - min(FRE_ON))])
+% xlabel('Time (s)')
+% ylabel('Frequency (Hz)')
 
 % Plot the OFF frequency with time.
 figure;
-plot(FRE_OFF,'--o')
+subplot(1,2,1)
+plot(T_OFF,FRE_OFF,'--o')
+xlabel('Time (s)')
+ylabel('Frequency (Hz)')
+title('Dissociation')
 
 % Plot the REC frequency with time.
-figure;
-plot(FRE_REC,'--o')
+% figure;
+
+subplot(1,2,2)
+plot(T_REC,FRE_REC,'--o')
+xlabel('Time (s)')
+ylabel('Frequency (Hz)')
+title('Recovery')
