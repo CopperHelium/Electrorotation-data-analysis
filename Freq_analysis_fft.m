@@ -168,7 +168,9 @@ for kk = 1:lengthFiles
         f = fs*(0:(length(Y_chunk)/2))/length(Y_chunk);
         
         if ii==1
-            [~,loc] = max(P1x+P1y);
+            [~,ind] = max(P1x+P1y);
+        else
+            [~,ind] = min(abs(f-FRE_OFF(ii-1)));
         end
         [peakLoc, peakMag] = peakfinder(P1x+P1y);
         [Mag_d,I] = sort(peakMag,'descend');
@@ -177,7 +179,7 @@ for kk = 1:lengthFiles
         else
             Loc_d = peakLoc(I);
         end
-        loc_diff = abs(Loc_d - loc);
+        loc_diff = abs(Loc_d - ind);
         [~,min_loc]= min(loc_diff);
         loc = Loc_d(min_loc);
         FRE_OFF(ii) = f(loc);
