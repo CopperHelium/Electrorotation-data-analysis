@@ -225,6 +225,10 @@ for kk = 1:lengthFiles
     set(gcf,'PaperPosition',[xLeft yTop xSize ySize])
     set(gcf,'Position',[100 100 xSize*50 ySize*50])
     set(gcf,'PaperOrientation','landscape');
+    
+    axes('position',[0 0 1 1],'visible','off')
+    text(0.23,0.75,strcat('Electrorotation speed = ',sprintf(' %0.0f',FRE_ON_mean),char(177),sprintf('%0.0f',FRE_ON_std)))
+    axis([0 1 0 1])
     %     set(h, 'Position', [50, 200, 1400, 500]);
     plot_name = strcat(file_name(1:end-4),'.pdf');
     saveas(gcf,plot_name)
