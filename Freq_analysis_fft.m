@@ -167,7 +167,7 @@ for kk = 1:lengthFiles
         
         f = fs*(0:(length(Y_chunk)/2))/length(Y_chunk);
         
-        if ii==1||2
+        if ii==1
             [~,loc] = max(P1x+P1y);
         end
         [peakLoc, peakMag] = peakfinder(P1x+P1y);
