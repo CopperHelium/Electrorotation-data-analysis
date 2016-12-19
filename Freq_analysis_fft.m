@@ -228,19 +228,33 @@ for kk = 1:lengthFiles
             Y_chunk = filter(b,a,Y_chunk); %apply the lowpass filter
             
             
-            [pxx,f] = periodogram(X_chunk - mean(X_chunk), [],[],fs);
-            pyy = periodogram(Y_chunk - mean(Y_chunk), [],[],fs);
+            fftx = fft(X_chunk - mean(X_chunk));
+        ffty = fft(Y_chunk - mean(Y_chunk));
+        
+        P2x = abs(fftx/length(X_chunk));
+        P1x = P2x(1:length(X_chunk)/2+1);
+        P1x(2:end-1) = 2*P1x(2:end-1);
+        
+        P2y = abs(ffty/length(Y_chunk));
+        P1y = P2y(1:length(Y_chunk)/2+1);
+        P1y(2:end-1) = 2*P1y(2:end-1);
+        
+        f = fs*(0:(length(Y_chunk)/2))/length(Y_chunk);
+        
             if jj==1
-                [~,loc] = max(pxx+pyy);
+                [~,ind] = max(P1x+P1y);
+                else
+            [~,ind] = min(abs(f-FRE_REC(jj-1)));
             end
-            [peakLoc, peakMag] = peakfinder(pxx+pyy);
+            
+            [peakLoc, peakMag] = peakfinder(P1x+P1y);
             [Mag_d,I] = sort(peakMag,'descend');
             if length(peakLoc)>5
                 Loc_d = peakLoc(I(1:5));
             else
                 Loc_d = peakLoc(I);
             end
-            loc_diff = abs(Loc_d - loc);
+            loc_diff = abs(Loc_d - ind);
             [~,min_loc]= min(loc_diff);
             loc = Loc_d(min_loc);
             FRE_REC(jj) = f(loc);
