@@ -295,8 +295,8 @@ for kk = 1:lengthFiles
     figure;
     A1 = axes('position',[0.08 0.2 0.4 0.6]);
     A2 = axes('position',[0.56 0.2 0.4 0.6]);
-    
     set(gcf,'CurrentAxes',A1)
+    set(gca, 'FontSize', 20)
     plot(T_OFF,FRE_OFF,'-s','color','k')
     xlabel('Time (s)','FontSize', 20)
     ylabel('Frequency (Hz)','FontSize', 20)
@@ -307,9 +307,11 @@ for kk = 1:lengthFiles
         top = 2*ceil(0.5*max([FRE_OFF]));
     end
     ylim([0 top])
-    set(gca, 'FontSize', 20)    
-    set(gcf,'CurrentAxes',A2)
+    set(gca, 'FontSize', 20)
     
+    
+    set(gcf,'CurrentAxes',A2)
+    set(gca, 'FontSize', 20)
     if rec_flag
         plot(T_REC,FRE_REC,'-s','color','k')
     end
@@ -317,7 +319,6 @@ for kk = 1:lengthFiles
     ylabel('Frequency (Hz)','FontSize', 20)
     title('Recovery')
     ylim([0 top])
-    set(gca, 'FontSize', 20)
     
     set(gcf,'PaperType','A4')
     set(gcf,'PaperUnits','centimeters')
